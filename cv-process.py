@@ -10,8 +10,6 @@ def feed(model_id, api_key, n):
     data = {'file': open(image_path, 'rb'),    'modelId': ('', model_id)}
 
     response = requests.post(url, auth=requests.auth.HTTPBasicAuth(api_key, ''), files=data)
-
-    #draw boxes on the image
     response = json.loads(response.text)
 
     prediction = response["result"][0]["prediction"]
@@ -26,15 +24,16 @@ def useCV(model_id, api_key, n):
         cv2.imwrite(n, frame)
         prediction = feed(model_id, api_key, n)
 
+        # draw boxes on the image
         for i in prediction:
             if i["score"] > .75:
-                cv2.rectangle(frame,(i["xmin"],i["ymin"]), (i["xmax"],i["ymax"]), (0, 255, 0), 3)
-        cv2.imshow("Frame", frame)
+                percentVal = "fire: " + str(i["score"]*100) + '%'
+                cv2.rectangle(frame,(i["xmin"],i["ymin"]+3), (i["xmax"],i["ymax"]), (0, 255, 0), 3)
+                cv2.putText(frame, percentVal, (i["xmin"], i["ymax"]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
+        cv2.imshow("Frame", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
-        time.sleep(1)
 
     cap.release()
     cv2.destroyAllWindows()
