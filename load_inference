@@ -1,4 +1,3 @@
-#Run inference on a model
 import numpy as np
 
 from PIL import Image
